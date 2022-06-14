@@ -19,7 +19,6 @@ RUN curl -SL https://dl.google.com/linux/direct/google-chrome-stable_current_amd
     mv /google-chrome-stable/opt/* /opt && \
     rm -r /google-chrome-stable
 
-
 RUN adduser -S -D -H -h /app appuser
 USER appuser
 COPY --from=builder /build/server /app/
