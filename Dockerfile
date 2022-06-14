@@ -12,6 +12,7 @@ FROM alpine
 RUN adduser -S -D -H -h /app appuser
 USER appuser
 COPY --from=builder /build/server /app/
+COPY --from=builder /build/yola.db /app/
 WORKDIR /app
 
 CMD ["./server"]
