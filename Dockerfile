@@ -9,7 +9,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external 
 
 FROM alpine
 
-RUN apk add build-base
+RUN apk add build-base curl dpkg
 
 RUN curl -SL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /google-chrome-stable_current_amd64.deb && \
     dpkg -x /google-chrome-stable_current_amd64.deb google-chrome-stable && \
