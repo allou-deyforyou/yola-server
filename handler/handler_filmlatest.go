@@ -11,12 +11,21 @@ import (
 
 func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 
-	context, cancel := chromedp.NewContext(context.Background(), chromedp.WithLogf(log.Printf))
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.Flag("headless", true),
+		chromedp.Flag("disable-gpu", true),
+	)
+
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+
+	// create context
+	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
 	defer cancel()
 
 	// run task list
 	var res string
-	err := chromedp.Run(context,
+	err := chromedp.Run(ctx,
 		chromedp.Navigate(`https://vostfree.tv/`),
 		chromedp.Text(`body`, &res, chromedp.NodeVisible),
 	)
