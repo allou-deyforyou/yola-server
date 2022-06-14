@@ -2,55 +2,50 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
-
-	"github.com/chromedp/chromedp"
+	"sync"
+	"time"
+	"yola/internal"
+	"yola/internal/entdata/moviesource"
+	"yola/internal/entdata/schema"
+	"yola/internal/source"
 )
 
 func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 
-	context, cancel := chromedp.NewContext(context.Background(), chromedp.WithLogf(log.Printf))
+	httpResponse, err := http.Get("https://vostfree.tv")
+	if err != nil {
+		panic(err)
+	}
+	log.Println(httpResponse.Status)
+
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		10*time.Second,
+	)
 	defer cancel()
 
-	// run task list
-	var res string
-	err := chromedp.Run(context,
-		chromedp.Navigate(`https://vostfree.tv`),
-		chromedp.Text(`body`, &res, chromedp.NodeVisible),
-	)
-	if err != nil {
-		log.Fatal(err)
+	movieSources, _ := h.MovieSource.Query().Where(moviesource.Status(true)).All(ctx)
+	sources := source.ParseMovieSources[source.FilmSource](movieSources)
+
+	params := internal.Params(r.Form)
+	page, _ := params.Int("page")
+	log.Println(page)
+
+	var moviePosts []schema.MoviePost
+	group := new(sync.WaitGroup)
+	for _, s := range sources {
+		group.Add(1)
+		go func(source source.FilmSource) {
+			posts := source.FilmLatestPost(ctx, page)
+			moviePosts = append(moviePosts, posts...)
+			group.Done()
+		}(s)
 	}
+	group.Wait()
 
-	log.Println(strings.TrimSpace(res))
-
-	// ctx, cancel := context.WithTimeout(
-	// 	context.Background(),
-	// 	10*time.Second,
-	// )
-	// defer cancel()
-
-	// movieSources, _ := h.MovieSource.Query().Where(moviesource.Status(true)).All(ctx)
-	// sources := source.ParseMovieSources[source.FilmSource](movieSources)
-
-	// params := internal.Params(r.Form)
-	// page, _ := params.Int("page")
-	// log.Println(page)
-
-	// var moviePosts []schema.MoviePost
-	// group := new(sync.WaitGroup)
-	// for _, s := range sources {
-	// 	group.Add(1)
-	// 	go func(source source.FilmSource) {
-	// 		posts := source.FilmLatestPost(ctx, page)
-	// 		moviePosts = append(moviePosts, posts...)
-	// 		group.Done()
-	// 	}(s)
-	// }
-	// group.Wait()
-
-	// response := internal.Shuffle(moviePosts)
-	// json.NewEncoder(w).Encode(response)
+	response := internal.Shuffle(moviePosts)
+	json.NewEncoder(w).Encode(response)
 }
