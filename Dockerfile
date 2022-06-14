@@ -1,11 +1,17 @@
-FROM golang:1.18-alpine
+FROM golang:1.18-alpine as builder
 
-WORKDIR /src
-COPY . .
+RUN mkdir /build
+ADD ./ /build/
+WORKDIR /build
 RUN apk add build-base
 RUN go mod download
 RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external -extldflags "-static"'
 
-EXPOSE 4000
+FROM alpine
 
-CMD ["/src/server"]
+RUN adduser -S -D -H -h /app appuser
+USER appuser
+COPY --from=builder /build/server /app/
+WORKDIR /app
+
+CMD ["./server"]
