@@ -9,7 +9,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external 
 
 FROM chromedp/headless-shell:latest
 
-RUN apk install dumb-init
+RUN apt install dumb-init
 
 ENTRYPOINT ["dumb-init", "--"]
 
