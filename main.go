@@ -1,10 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"yola/handler"
 	"yola/internal"
@@ -15,13 +15,12 @@ import (
 
 var httpHandler *handler.Handler
 var entClient *entdata.Client
-var port *string
+var port string
 
 func init() {
 	entClient = internal.NewEntClient()
 	httpHandler = handler.NewHandler(entClient)
-	flag.StringVar(port, "PORT", "4000", "")
-	flag.Parse()
+	port = os.Getenv("PORT")
 }
 
 func init() {
@@ -30,5 +29,5 @@ func init() {
 
 func main() {
 	defer entClient.Close()
-	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%s", *port), httpHandler))
+	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%s", port), httpHandler))
 }
