@@ -17,14 +17,14 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	// run task list
 	var res string
 	err := chromedp.Run(context,
-		chromedp.Navigate(`https://vostfree.tv`),
+		chromedp.Navigate(`https://vostfree.tv/`),
 		chromedp.Text(`body`, &res, chromedp.NodeVisible),
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Allou Error", err)
 	}
 
-	log.Println(strings.TrimSpace(res))
+	log.Println("Allou Data", strings.TrimSpace(res))
 
 	// ctx, cancel := context.WithTimeout(
 	// 	context.Background(),
