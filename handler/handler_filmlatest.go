@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -25,6 +26,7 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 
 	params := internal.Params(r.Form)
 	page, _ := params.Int("page")
+	log.Println(page)
 
 	var moviePosts []schema.MoviePost
 	group := new(sync.WaitGroup)

@@ -7,7 +7,6 @@ import (
 
 	"yola/internal/entdata"
 	"yola/internal/entdata/migrate"
-	"yola/internal/entdata/moviesource"
 	"yola/internal/entdata/schema"
 
 	"entgo.io/ent/dialect"
@@ -39,7 +38,7 @@ func TestCreateIllimitestreamingcoSource(t *testing.T) {
 		SetStatus(true).
 		SetName("illimitestreaming-co").
 		SetURL("https://www.illimitestreaming.co").
-		SetFilmLatestURL("/film/page/%v").
+		SetFilmLatestURL("/films/page/%v").
 		SetFilmLatestPostSelector(&schema.MoviePostSelector{
 			Title: []string{"h2"},
 			Image: []string{"img", "data-original"},
@@ -140,5 +139,5 @@ func TestCreateFrenchMangaNetSource(t *testing.T) {
 }
 
 func TestGetSources(t *testing.T) {
-	log.Println(entClient.MovieSource.Query().Where(moviesource.Status(true)).AllX(context.Background()))
+	entClient.MovieSource.Delete().Exec(context.Background())
 }
