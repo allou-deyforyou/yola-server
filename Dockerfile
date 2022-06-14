@@ -9,9 +9,10 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external 
 
 FROM chromedp/headless-shell:latest
 
-RUN apt install dumb-init
-
-ENTRYPOINT ["dumb-init", "--"]
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
 
 RUN adduser -S -D -H -h /app appuser
 USER appuser
