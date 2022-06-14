@@ -11,6 +11,7 @@ FROM alpine
 
 RUN apk add build-base curl dpkg
 
+RUN apk add chromium
 RUN curl -SL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /google-chrome-stable_current_amd64.deb && \
     dpkg -x /google-chrome-stable_current_amd64.deb google-chrome-stable && \
     mv /google-chrome-stable/usr/bin/* /usr/bin && \
