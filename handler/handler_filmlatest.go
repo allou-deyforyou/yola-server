@@ -11,8 +11,6 @@ import (
 
 func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	opts := []chromedp.ExecAllocatorOption{
-		chromedp.NoFirstRun,
-		chromedp.NoDefaultBrowserCheck,
 		chromedp.Headless,
 		chromedp.DisableGPU,
 		chromedp.NoSandbox,
