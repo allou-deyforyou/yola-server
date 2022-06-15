@@ -24,7 +24,7 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	var res string
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(`https://uqload.com/embed-wbcmmtoipiyf.html`),
-		chromedp.OuterHTML("body", &res),
+		chromedp.InnerHTML("html", &res),
 	)
 	if err != nil {
 		log.Fatal("Allou Error: ", err)
