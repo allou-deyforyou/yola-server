@@ -23,14 +23,14 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	// run task list
 	var res string
 	err := chromedp.Run(ctx,
-		chromedp.Navigate(`https://vostfree.tv/`),
+		chromedp.Navigate(`https://uqload.com/embed-wbcmmtoipiyf.html`),
 		chromedp.OuterHTML("body", &res),
 	)
 	if err != nil {
-		log.Fatal("Allou Error", err)
+		log.Fatal("Allou Error: ", err)
 	}
 
-	log.Println("Allou Data", strings.TrimSpace(res))
+	log.Println("Allou Data: ", strings.TrimSpace(res))
 
 	// ctx, cancel := context.WithTimeout(
 	// 	context.Background(),
