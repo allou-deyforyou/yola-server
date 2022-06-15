@@ -24,7 +24,7 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	var res string
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(`https://vostfree.tv/`),
-		chromedp.Text(`body`, &res, chromedp.NodeVisible),
+		chromedp.OuterHTML("body", &res),
 	)
 	if err != nil {
 		log.Fatal("Allou Error", err)
