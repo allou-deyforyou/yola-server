@@ -18,6 +18,25 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 )
 
+func rodPostRequest(url string, data string) (io.Reader, error) {
+	path, _ := launcher.LookPath()
+	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
+	response := rod.New().ControlURL(u).MustConnect().MustPage(url).MustEval(`
+	(url, data) => {
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST', url, false);
+		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		try {
+			xhr.send(data);
+		} catch (e) {
+			return e;
+		}
+		return xhr.response;
+	}
+	`, url, data).String()
+	return strings.NewReader(response), nil
+}
+
 func rodGetRequest(url string) (io.Reader, error) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
@@ -71,9 +90,9 @@ func (is *VostfreeTvSource) mangaLatestPostList(document *element.Element) []sch
 }
 
 func (is *VostfreeTvSource) MangaSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
-	request, _ := http.NewRequestWithContext(ctx, http.MethodPost,
+	response, err := rodPostRequest(
 		fmt.Sprintf("%s%s", is.URL, *is.MangaSerieSearchURL),
-		strings.NewReader(url.Values{
+		url.Values{
 			"do":           []string{"search"},
 			"subaction":    []string{"search"},
 			"story":        []string{query},
@@ -89,16 +108,12 @@ func (is *VostfreeTvSource) MangaSearchPost(ctx context.Context, query string, p
 			"resorder":     []string{"desc"},
 			"showposts":    []string{"0"},
 			"catlist[]":    []string{"0"},
-		}.Encode()),
+		}.Encode(),
 	)
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36")
-	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
-	defer response.Body.Close()
-	document, err := goquery.NewDocumentFromReader(response.Body)
+	document, err := goquery.NewDocumentFromReader(response)
 	if err != nil {
 		return nil
 	}
