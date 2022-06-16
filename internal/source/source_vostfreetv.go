@@ -145,7 +145,7 @@ func (is *VostfreeTvSource) mangaSearchPostList(document *element.Element) []sch
 }
 
 func (is *VostfreeTvSource) MangaArticle(_ context.Context, link string) *schema.MovieArticle {
-	response, err := chromeRequest(link)
+	response, err := rodRequest(link)
 	if err != nil {
 		return nil
 	}
