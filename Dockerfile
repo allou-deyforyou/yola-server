@@ -3,12 +3,12 @@ FROM alpine
 RUN apk add chromium
 
 RUN mkdir /build
-ADD ./build/* /build/
+ADD ./build/server /build/
 ADD ./yola.db  /build/
 
 WORKDIR /build
 
-CMD ["./yola"]
+CMD ["./server"]
 
 # RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external -extldflags "-static"'
 

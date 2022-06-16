@@ -1,2 +1,2 @@
 builder:
-	go mod tidy && go build -o build/yola
+	go mod tidy && go build -o build/server
