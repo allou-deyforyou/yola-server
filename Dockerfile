@@ -1,14 +1,16 @@
-FROM alpine
+FROM golang:1.18.3-alpine
 
-RUN apk add chromium
+RUN apk add build-base chromium
 
 RUN mkdir /build
-ADD ./build/server /build/
-ADD ./yola.db  /build/
+ADD ./ /build/
 
 WORKDIR /build
 
-CMD ["/build/server"]
+RUN go mod download
+RUN GOPROXY=https://goproxy.io,direct go build -o server
+
+CMD ["./server"]
 
 # RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external -extldflags "-static"'
 
