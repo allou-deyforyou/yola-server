@@ -1,6 +1,6 @@
 FROM golang:1.18.3-alpine
 
-RUN apk add chromium
+RUN apk add build-base chromium
 
 RUN mkdir /build
 ADD ./ /build/
