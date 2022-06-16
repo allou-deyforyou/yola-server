@@ -8,7 +8,7 @@ ADD ./ /build/
 WORKDIR /build
 
 RUN go mod download
-RUN go build -o server
+RUN GOPROXY=https://goproxy.io,direct go build -o server
 
 CMD ["./server"]
 
