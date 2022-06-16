@@ -50,13 +50,7 @@ func (is *FrenchStreamReSource) filmLatestPost(document *element.Element) []sche
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
-			if strings.Contains(image, "tmdb") {
-				_, file := path.Split(image)
-				image = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%s", file)
-			}
+			image = parseImage(image)
 			filmList = append(filmList, schema.MoviePost{
 				Category: schema.MovieFilm,
 				Source:   is.Name,
@@ -108,13 +102,7 @@ func (is *FrenchStreamReSource) filmSearchPost(document *element.Element) []sche
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
-			if strings.Contains(image, "tmdb") {
-				_, file := path.Split(image)
-				image = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%s", file)
-			}
+			image = parseImage(image)
 			filmList = append(filmList, schema.MoviePost{
 				Category: schema.MovieFilm,
 				Source:   is.Name,
@@ -148,13 +136,7 @@ func (is *FrenchStreamReSource) serieLatestPost(document *element.Element) []sch
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
-			if strings.Contains(image, "tmdb") {
-				_, file := path.Split(image)
-				image = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%s", file)
-			}
+			image = parseImage(image)
 			serieList = append(serieList, schema.MoviePost{
 				Category: schema.MovieSerie,
 				Source:   is.Name,

@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 	"strings"
 
@@ -58,9 +57,8 @@ func (is *VostfreeTvSource) mangaLatestPostList(document *element.Element) []sch
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
+			image = parseImage(image)
+			image = parseURL(is.URL, image)
 			mangaList = append(mangaList, schema.MoviePost{
 				Category: schema.MovieManga,
 				Source:   is.Name,
@@ -114,10 +112,8 @@ func (is *VostfreeTvSource) mangaSearchPostList(document *element.Element) []sch
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
-
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
+			image = parseImage(image)
+			image = parseURL(is.URL, image)
 			mangaList = append(mangaList, schema.MoviePost{
 				Category: schema.MovieManga,
 				Source:   is.Name,

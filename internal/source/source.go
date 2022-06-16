@@ -3,6 +3,11 @@ package source
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
+	"net/url"
+	"path"
+	"strings"
 
 	"yola/internal/entdata"
 	"yola/internal/entdata/schema"
@@ -76,4 +81,25 @@ func ParseFilmSource(name string, source *entdata.MovieSource) (FilmSource, erro
 	default:
 		return nil, errors.New("no-found")
 	}
+}
+
+func parseImage(image string) string {
+	if strings.Contains(image, "imgur") {
+		image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
+	}
+	if strings.Contains(image, "tmdb") {
+		_, file := path.Split(image)
+		image = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%s", file)
+	}
+	return image
+}
+
+func parseURL(baseURL, rawURL string) string {
+	bu, _ := url.Parse(baseURL)
+	u, err := bu.Parse(rawURL)
+	if err != nil {
+		log.Println(err)
+		return rawURL
+	}
+	return u.String()
 }

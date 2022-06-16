@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path"
 	"strings"
 
 	"yola/internal/element"
@@ -49,13 +48,7 @@ func (is *Illimitestreamingco) filmLatestPostList(document *element.Element) []s
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
 
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
-			if strings.Contains(image, "tmdb") {
-				_, file := path.Split(image)
-				image = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%s", file)
-			}
+			image = parseImage(image)
 			filmList = append(filmList, schema.MoviePost{
 				Category: schema.MovieFilm,
 				Source:   is.Name,
@@ -91,13 +84,7 @@ func (is *Illimitestreamingco) filmSearchPost(document *element.Element) []schem
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
-			if strings.Contains(image, "imgur") {
-				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
-			}
-			if strings.Contains(image, "tmdb") {
-				_, file := path.Split(image)
-				image = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%s", file)
-			}
+			image = parseImage(image)
 			if strings.Contains(strings.ToLower(element.ChildText(".jtip-bottom")), "film") {
 				filmList = append(filmList, schema.MoviePost{
 					Category: schema.MovieFilm,
