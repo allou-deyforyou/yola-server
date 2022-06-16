@@ -32,7 +32,7 @@ func chromeRequest(url string) (io.Reader, error) {
 	var response string
 	chromedp.Run(ctx,
 		chromedp.Navigate(url),
-		chromedp.OuterHTML("html", &response),
+		chromedp.InnerHTML("body", &response),
 	)
 	return strings.NewReader(response), nil
 }
