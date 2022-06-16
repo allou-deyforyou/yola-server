@@ -59,7 +59,7 @@ func (MovieSource) Fields() []ent.Field {
 			Optional(),
 
 		field.Bool("status").Default(true),
-		field.String("name"),
+		field.String("name").Unique(),
 		field.String("url"),
 	}
 }

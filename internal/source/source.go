@@ -51,6 +51,8 @@ func ParseMangaSource(name string, source *entdata.MovieSource) (MangaSource, er
 	switch name {
 	case "french-manga-net":
 		return NewFrenchMangaNetSource(source), nil
+	case "vostfree-tv":
+		return NewVostfreeTvSource(source), nil
 	default:
 		return nil, errors.New("no-found")
 	}

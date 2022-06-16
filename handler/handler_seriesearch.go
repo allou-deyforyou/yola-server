@@ -26,7 +26,7 @@ func (h *Handler) SerieSearchPost(w http.ResponseWriter, r *http.Request) {
 	movieSources := h.MovieSource.Query().Where(moviesource.Status(true)).AllX(ctx)
 	sources := source.ParseMovieSources[source.SerieSource](movieSources)
 
-	var moviePosts []schema.MoviePost
+	moviePosts := make([]schema.MoviePost, 0)
 	group := new(sync.WaitGroup)
 	for _, s := range sources {
 		group.Add(1)

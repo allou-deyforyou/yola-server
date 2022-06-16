@@ -4,44 +4,26 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
+
 	"yola/internal/element"
 	"yola/internal/entdata"
 	"yola/internal/entdata/schema"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/cdproto/dom"
-	"github.com/chromedp/chromedp"
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 func chromeRequest(url string) (io.Reader, error) {
-	opts := []chromedp.ExecAllocatorOption{
-		// chromedp.Headless,
-		// chromedp.DisableGPU,
-		chromedp.NoSandbox,
-	}
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer cancel()
-	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
-	defer cancel()
-	var response string
-	err := chromedp.Run(ctx,
-		chromedp.Navigate(url),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			node, err := dom.GetDocument().Do(ctx)
-			if err != nil {
-				return err
-			}
-			res, er := dom.GetOuterHTML().WithNodeID(node.NodeID).Do(ctx)
-			response = res
-			return er
-		}),
-	)
-	return strings.NewReader(response), err
+	path, _ := launcher.LookPath()
+	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
+	page := rod.New().ControlURL(u).MustConnect().MustPage(url)
+	return strings.NewReader(page.MustElement("body").MustHTML()), nil
 }
 
 type VostfreeTvSource struct {
@@ -76,6 +58,63 @@ func (is *VostfreeTvSource) mangaLatestPostList(document *element.Element) []sch
 			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
 			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
 			title := element.ChildText(selector.Title[0])
+			if strings.Contains(image, "imgur") {
+				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
+			}
+			mangaList = append(mangaList, schema.MoviePost{
+				Category: schema.MovieManga,
+				Source:   is.Name,
+				Image:    image,
+				Title:    title,
+				Link:     link,
+			})
+		})
+	return mangaList
+}
+
+func (is *VostfreeTvSource) MangaSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodPost,
+		fmt.Sprintf("%s%s", is.URL, *is.MangaSerieSearchURL),
+		strings.NewReader(url.Values{
+			"do":           []string{"search"},
+			"subaction":    []string{"search"},
+			"story":        []string{query},
+			"search_start": []string{strconv.Itoa(page)},
+			"full_search":  []string{"1"},
+			"result_from":  []string{strconv.Itoa(page)},
+			"titleonly":    []string{"0"},
+			"replyless":    []string{"0"},
+			"replylimit":   []string{"0"},
+			"searchdate":   []string{"0"},
+			"beforeafter":  []string{"after"},
+			"sortby":       []string{"date"},
+			"resorder":     []string{"desc"},
+			"showposts":    []string{"0"},
+			"catlist[]":    []string{"0"},
+		}.Encode()),
+	)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response, err := is.Do(request)
+	if err != nil {
+		return nil
+	}
+	defer response.Body.Close()
+	document, err := goquery.NewDocumentFromReader(response.Body)
+	if err != nil {
+		return nil
+	}
+	return is.mangaSearchPostList(element.NewElement(document.Selection))
+}
+
+func (is *VostfreeTvSource) mangaSearchPostList(document *element.Element) []schema.MoviePost {
+	selector := is.MangaSerieSearchPostSelector
+	mangaList := make([]schema.MoviePost, 0)
+	document.ForEach(selector.List[0],
+		func(i int, element *element.Element) {
+			image := element.ChildAttribute(selector.Image[0], selector.Image[1])
+			link := element.ChildAttribute(selector.Link[0], selector.Link[1])
+			title := element.ChildText(selector.Title[0])
+
 			if strings.Contains(image, "imgur") {
 				image = strings.ReplaceAll(image, path.Ext(image), "h"+path.Ext(image))
 			}
@@ -125,7 +164,7 @@ func (is *VostfreeTvSource) mangaArticle(document *element.Element) *schema.Movi
 			hosters := make([]string, 0)
 			e.ForEach("div", func(i int, e *element.Element) {
 				name := strings.ToLower(e.Text())
-				link := document.ChildText(fmt.Sprintf("content_%v", e.Attribute("id")))
+				link := document.ChildText(fmt.Sprintf("#content_%v", e.Attribute("id")))
 				switch name {
 				case "sibnet":
 					link = fmt.Sprintf("https://video.sibnet.ru/shell.php?videoid=%v", link)

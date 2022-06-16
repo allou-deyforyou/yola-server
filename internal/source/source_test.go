@@ -7,6 +7,7 @@ import (
 
 	"yola/internal/entdata"
 	"yola/internal/entdata/migrate"
+	"yola/internal/entdata/moviesource"
 	"yola/internal/entdata/schema"
 
 	"entgo.io/ent/dialect"
@@ -159,12 +160,17 @@ func TestCreateVostfreeTvSource(t *testing.T) {
 		}).
 		SetMangaSerieArticleSelector(&schema.MovieArticleSelector{
 			Hosters:     []string{".new_player_bottom > div", ".slide-middle"},
-			Genders:     []string{".slide-top li"},
+			Genders:     []string{".slide-top li.right a"},
 			Date:        []string{".slide-info p"},
 			Description: []string{".slide-desc"},
 		}).Save(context.Background())
 }
 
 func TestGetSources(t *testing.T) {
-	entClient.MovieSource.Delete().Exec(context.Background())
+	log.Println(entClient.MovieSource.Query().AllX(context.Background()))
+}
+
+
+func TestRemoveSources(t *testing.T) {
+	log.Println(entClient.MovieSource.Delete().Where(moviesource.Name("vostfree-tv")).Exec(context.Background()))
 }

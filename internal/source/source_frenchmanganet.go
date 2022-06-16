@@ -73,7 +73,7 @@ func (is *FrenchMangaNetSource) MangaSearchPost(ctx context.Context, query strin
 			"story":        []string{query},
 			"search_start": []string{strconv.Itoa(page)},
 			"full_search":  []string{"1"},
-			"result_from":  []string{"1"},
+			"result_from":  []string{strconv.Itoa(page)},
 			"titleonly":    []string{"3"},
 			"replyless":    []string{"0"},
 			"replylimit":   []string{"0"},

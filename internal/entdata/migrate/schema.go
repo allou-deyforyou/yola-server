@@ -32,7 +32,7 @@ var (
 		{Name: "serie_article_selector", Type: field.TypeJSON, Nullable: true},
 		{Name: "film_article_selector", Type: field.TypeJSON, Nullable: true},
 		{Name: "status", Type: field.TypeBool, Default: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "url", Type: field.TypeString},
 	}
 	// MovieSourcesTable holds the schema information for the "movie_sources" table.

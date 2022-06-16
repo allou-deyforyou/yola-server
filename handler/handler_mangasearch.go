@@ -27,7 +27,7 @@ func (h *Handler) MangaSearchPost(w http.ResponseWriter, r *http.Request) {
 	movieSources := h.MovieSource.Query().Where(moviesource.Status(true)).AllX(ctx)
 	sources := source.ParseMovieSources[source.MangaSource](movieSources)
 
-	var moviePosts []schema.MoviePost
+	moviePosts := make([]schema.MoviePost, 0)
 	group := new(sync.WaitGroup)
 	for _, s := range sources {
 		group.Add(1)

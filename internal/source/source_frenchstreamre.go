@@ -69,15 +69,15 @@ func (is *FrenchStreamReSource) filmLatestPost(document *element.Element) []sche
 }
 
 func (is *FrenchStreamReSource) FilmSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
-	request, _ := http.NewRequestWithContext(ctx, http.MethodGet,
-		fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.FilmSearchURL, page)),
+	request, _ := http.NewRequestWithContext(ctx, http.MethodPost,
+		"https://french-manga.net/index.php?do=search",
 		strings.NewReader(url.Values{
 			"do":           []string{"search"},
 			"subaction":    []string{"search"},
 			"story":        []string{query},
 			"search_start": []string{strconv.Itoa(page)},
 			"full_search":  []string{"1"},
-			"result_from":  []string{"1"},
+			"result_from":  []string{strconv.Itoa(page)},
 			"titleonly":    []string{"3"},
 			"replyless":    []string{"0"},
 			"replylimit":   []string{"0"},
@@ -167,15 +167,15 @@ func (is *FrenchStreamReSource) serieLatestPost(document *element.Element) []sch
 }
 
 func (is *FrenchStreamReSource) SerieSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
-	request, _ := http.NewRequestWithContext(ctx, http.MethodGet,
-		fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.SerieSearchURL, page)),
+	request, _ := http.NewRequestWithContext(ctx, http.MethodPost,
+		"https://french-manga.net/index.php?do=search",
 		strings.NewReader(url.Values{
 			"do":           []string{"search"},
 			"subaction":    []string{"search"},
 			"story":        []string{query},
 			"search_start": []string{strconv.Itoa(page)},
 			"full_search":  []string{"1"},
-			"result_from":  []string{"1"},
+			"result_from":  []string{strconv.Itoa(page)},
 			"titleonly":    []string{"3"},
 			"replyless":    []string{"0"},
 			"replylimit":   []string{"0"},
@@ -187,6 +187,7 @@ func (is *FrenchStreamReSource) SerieSearchPost(ctx context.Context, query strin
 			"catlist[]":    []string{"10"},
 		}.Encode()),
 	)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	response, err := is.Do(request)
 	if err != nil {
 		return nil
