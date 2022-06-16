@@ -25,4 +25,3 @@ CMD ["./server"]
 # COPY --from=builder /build/server /app/
 # COPY --from=builder /build/yola.db /app/
 # WORKDIR /app
-
