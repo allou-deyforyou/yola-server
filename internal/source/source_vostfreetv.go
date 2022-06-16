@@ -14,11 +14,30 @@ import (
 	"yola/internal/entdata/schema"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/chromedp"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 )
 
 func chromeRequest(url string) (io.Reader, error) {
+	opts := []chromedp.ExecAllocatorOption{
+		chromedp.NoSandbox,
+	}
+
+	allCtx, allCancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer allCancel()
+	ctx, cancel := chromedp.NewContext(allCtx)
+	defer cancel()
+
+	var response string
+	chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		chromedp.OuterHTML("html", &response),
+	)
+	return strings.NewReader(response), nil
+}
+
+func rodRequest(url string) (io.Reader, error) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage(url)
@@ -38,7 +57,7 @@ func NewVostfreeTvSource(source *entdata.MovieSource) *VostfreeTvSource {
 }
 
 func (is *VostfreeTvSource) MangaLatestPost(_ context.Context, page int) []schema.MoviePost {
-	response, err := chromeRequest(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
+	response, err := rodRequest(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
 	if err != nil {
 		return nil
 	}

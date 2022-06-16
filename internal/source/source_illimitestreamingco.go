@@ -3,7 +3,6 @@ package source
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -148,7 +147,6 @@ func (is *Illimitestreamingco) filmArticle(document *element.Element) *schema.Mo
 	videos := make([]schema.MovieVideo, 0)
 	subtitleHosters := make([]string, 0)
 	hosters := make([]string, 0)
-	log.Println(document.ChildContent(articleSelector.Hosters[0]))
 	document.ForEach(articleSelector.Hosters[0],
 		func(i int, e *element.Element) {
 			id := e.ChildAttribute("a", "href")

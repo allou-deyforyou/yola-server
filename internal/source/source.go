@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"path"
 	"strings"
@@ -98,7 +97,7 @@ func parseURL(baseURL, rawURL string) string {
 	bu, _ := url.Parse(baseURL)
 	u, err := bu.Parse(rawURL)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		return rawURL
 	}
 	return u.String()
