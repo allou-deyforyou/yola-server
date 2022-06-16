@@ -12,7 +12,7 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("https://vostfree.tv")
-	fmt.Println(page.MustHTML())
+	fmt.Println(page.MustElement("body").MustHTML())
 	// ctx, cancel := context.WithTimeout(
 	// 	context.Background(),
 	// 	10*time.Second,
