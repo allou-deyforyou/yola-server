@@ -138,6 +138,33 @@ func TestCreateFrenchMangaNetSource(t *testing.T) {
 		}).Save(context.Background())
 }
 
+func TestCreateVostfreeTvSource(t *testing.T) {
+	entClient.MovieSource.Create().
+		SetStatus(true).
+		SetName("vostfree-tv").
+		SetURL("https://vostfree.tv/").
+		SetMangaSerieLatestURL("/animes-vostfr/page/%v").
+		SetMangaSerieLatestPostSelector(&schema.MoviePostSelector{
+			Title: []string{".title"},
+			Image: []string{"img", "src"},
+			Link:  []string{"a", "href"},
+			List:  []string{"#dle-content > .movie-poster"},
+		}).
+		SetMangaSerieSearchURL("/index.php?do=search").
+		SetMangaSerieSearchPostSelector(&schema.MoviePostSelector{
+			Title: []string{".title"},
+			Image: []string{"img", "src"},
+			Link:  []string{".title a", "href"},
+			List:  []string{"#dle-content .search-result"},
+		}).
+		SetMangaSerieArticleSelector(&schema.MovieArticleSelector{
+			Hosters:     []string{".new_player_bottom > div", ".slide-middle"},
+			Genders:     []string{".slide-top li"},
+			Date:        []string{".slide-info p"},
+			Description: []string{".slide-desc"},
+		}).Save(context.Background())
+}
+
 func TestGetSources(t *testing.T) {
 	entClient.MovieSource.Delete().Exec(context.Background())
 }

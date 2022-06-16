@@ -1,0 +1,30 @@
+package handler
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"yola/internal"
+	"yola/internal/entdata/moviesource"
+	"yola/internal/source"
+)
+
+func (h *Handler) MangaArticle(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		10*time.Second,
+	)
+	defer cancel()
+
+	params := internal.Params(r.Form)
+	name, _ := params.String("source")
+	link, _ := params.String("link")
+
+	movieSource := h.MovieSource.Query().Where(moviesource.And(moviesource.Status(true), moviesource.Name(name))).OnlyX(ctx)
+	source, _ := source.ParseMangaSource(movieSource.Name, movieSource)
+
+	response := source.MangaArticle(ctx, link)
+	json.NewEncoder(w).Encode(response)
+}

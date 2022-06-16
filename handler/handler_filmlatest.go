@@ -1,49 +1,26 @@
 package handler
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"strings"
 
-	"github.com/chromedp/chromedp"
+	"github.com/go-rod/rod"
 )
 
 func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
-	opts := []chromedp.ExecAllocatorOption{
-		chromedp.Headless,
-		chromedp.DisableGPU,
-		chromedp.NoSandbox,
-	}
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer cancel()
-	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
-	defer cancel()
-
-	// run task list
-	var res string
-	err := chromedp.Run(ctx,
-		chromedp.Navigate(`https://uqload.com/embed-wbcmmtoipiyf.html`),
-		chromedp.InnerHTML("html", &res),
-	)
-	if err != nil {
-		log.Fatal("Allou Error: ", err)
-	}
-
-	log.Println("Allou Data: ", strings.TrimSpace(res))
-
+	page := rod.New().MustConnect().MustPage("https://vostfree.tv")
+	log.Println(page.HTML())
 	// ctx, cancel := context.WithTimeout(
 	// 	context.Background(),
 	// 	10*time.Second,
 	// )
 	// defer cancel()
 
-	// movieSources, _ := h.MovieSource.Query().Where(moviesource.Status(true)).All(ctx)
-	// sources := source.ParseMovieSources[source.FilmSource](movieSources)
-
 	// params := internal.Params(r.Form)
 	// page, _ := params.Int("page")
-	// log.Println(page)
+
+	// movieSources, _ := h.MovieSource.Query().Where(moviesource.Status(true)).All(ctx)
+	// sources := source.ParseMovieSources[source.FilmSource](movieSources)
 
 	// var moviePosts []schema.MoviePost
 	// group := new(sync.WaitGroup)

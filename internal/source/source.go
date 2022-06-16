@@ -9,21 +9,21 @@ import (
 )
 
 type MangaSource interface {
-	MangaArticle(link string) *schema.MovieArticle
-	MangaLatestPostList(page int) []schema.MoviePost
-	MangaSearchPostList(query string, page int) []schema.MoviePost
+	MangaArticle(ctx context.Context, link string) *schema.MovieArticle
+	MangaLatestPost(ctx context.Context, page int) []schema.MoviePost
+	MangaSearchPost(ctx context.Context, query string, page int) []schema.MoviePost
 }
 
 type SerieSource interface {
-	SerieArticle(link string) *schema.MovieArticle
-	SerieLatestPostList(page int) []schema.MoviePost
-	SerieSearchPostList(query string, page int) []schema.MoviePost
+	SerieArticle(ctx context.Context, link string) *schema.MovieArticle
+	SerieLatestPost(ctx context.Context, page int) []schema.MoviePost
+	SerieSearchPost(ctx context.Context, query string, page int) []schema.MoviePost
 }
 
 type FilmSource interface {
-	FilmArticle(link string) *schema.MovieArticle
+	FilmArticle(ctx context.Context, link string) *schema.MovieArticle
 	FilmLatestPost(ctx context.Context, page int) []schema.MoviePost
-	FilmSearchPostList(query string, page int) []schema.MoviePost
+	FilmSearchPost(ctx context.Context, query string, page int) []schema.MoviePost
 }
 
 func ParseMovieSources[T any](movieSources []*entdata.MovieSource) []T {
@@ -31,15 +31,15 @@ func ParseMovieSources[T any](movieSources []*entdata.MovieSource) []T {
 	for _, movieSource := range movieSources {
 		switch (interface{})(sources).(type) {
 		case []MangaSource:
-			if source, err := parseMangaSource(movieSource.Name, movieSource); err == nil {
+			if source, err := ParseMangaSource(movieSource.Name, movieSource); err == nil {
 				sources = append(sources, source.(T))
 			}
 		case []SerieSource:
-			if source, err := parseSerieSource(movieSource.Name, movieSource); err == nil {
+			if source, err := ParseSerieSource(movieSource.Name, movieSource); err == nil {
 				sources = append(sources, source.(T))
 			}
 		case []FilmSource:
-			if source, err := parseFilmSource(movieSource.Name, movieSource); err == nil {
+			if source, err := ParseFilmSource(movieSource.Name, movieSource); err == nil {
 				sources = append(sources, source.(T))
 			}
 		}
@@ -47,7 +47,7 @@ func ParseMovieSources[T any](movieSources []*entdata.MovieSource) []T {
 	return sources
 }
 
-func parseMangaSource(name string, source *entdata.MovieSource) (MangaSource, error) {
+func ParseMangaSource(name string, source *entdata.MovieSource) (MangaSource, error) {
 	switch name {
 	case "french-manga-net":
 		return NewFrenchMangaNetSource(source), nil
@@ -56,7 +56,7 @@ func parseMangaSource(name string, source *entdata.MovieSource) (MangaSource, er
 	}
 }
 
-func parseSerieSource(name string, source *entdata.MovieSource) (SerieSource, error) {
+func ParseSerieSource(name string, source *entdata.MovieSource) (SerieSource, error) {
 	switch name {
 	case "french-stream-re":
 		return NewFrenchStreamReSource(source), nil
@@ -65,7 +65,7 @@ func parseSerieSource(name string, source *entdata.MovieSource) (SerieSource, er
 	}
 }
 
-func parseFilmSource(name string, source *entdata.MovieSource) (FilmSource, error) {
+func ParseFilmSource(name string, source *entdata.MovieSource) (FilmSource, error) {
 	switch name {
 	case "french-stream-re":
 		return NewFrenchStreamReSource(source), nil

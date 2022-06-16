@@ -67,10 +67,9 @@ func (is *Illimitestreamingco) filmLatestPostList(document *element.Element) []s
 	return filmList
 }
 
-func (is *Illimitestreamingco) FilmSearchPostList(query string, page int) []schema.MoviePost {
-	response, err := is.Get(
-		fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.FilmSearchURL, page, query)),
-	)
+func (is *Illimitestreamingco) FilmSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.FilmSearchURL, page, query)), nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -78,10 +77,10 @@ func (is *Illimitestreamingco) FilmSearchPostList(query string, page int) []sche
 	if err != nil {
 		return nil
 	}
-	return is.filmSearchPostList(element.NewElement(document.Selection))
+	return is.filmSearchPost(element.NewElement(document.Selection))
 }
 
-func (is *Illimitestreamingco) filmSearchPostList(document *element.Element) []schema.MoviePost {
+func (is *Illimitestreamingco) filmSearchPost(document *element.Element) []schema.MoviePost {
 	if !strings.Contains(strings.ToLower(document.ChildText(".movies-list-wrap .ml-title")), "recherche") {
 		return nil
 	}
@@ -112,8 +111,9 @@ func (is *Illimitestreamingco) filmSearchPostList(document *element.Element) []s
 	return filmList
 }
 
-func (is *Illimitestreamingco) FilmArticle(link string) *schema.MovieArticle {
-	response, err := is.Get(link)
+func (is *Illimitestreamingco) FilmArticle(ctx context.Context, link string) *schema.MovieArticle {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, link, nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}

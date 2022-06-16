@@ -1,6 +1,7 @@
 package source
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -27,9 +28,9 @@ func NewFrenchMangaNetSource(source *entdata.MovieSource) *FrenchMangaNetSource 
 	}
 }
 
-func (is *FrenchMangaNetSource) MangaLatestPostList(page int) []schema.MoviePost {
-	fmt.Println("FrenchMangaNetSource")
-	response, err := is.Get(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
+func (is *FrenchMangaNetSource) MangaLatestPost(ctx context.Context, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)), nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -63,10 +64,10 @@ func (is *FrenchMangaNetSource) mangaLatestPostList(document *element.Element) [
 	return mangaList
 }
 
-func (is *FrenchMangaNetSource) MangaSearchPostList(query string, page int) []schema.MoviePost {
-	response, err := is.PostForm(
+func (is *FrenchMangaNetSource) MangaSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet,
 		fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieSearchURL, page)),
-		url.Values{
+		strings.NewReader(url.Values{
 			"do":           []string{"search"},
 			"subaction":    []string{"search"},
 			"story":        []string{query},
@@ -82,11 +83,13 @@ func (is *FrenchMangaNetSource) MangaSearchPostList(query string, page int) []sc
 			"resorder":     []string{"desc"},
 			"showposts":    []string{"0"},
 			"catlist[]":    []string{"16"},
-		},
+		}.Encode()),
 	)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
+	defer response.Body.Close()
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		return nil
@@ -117,8 +120,9 @@ func (is *FrenchMangaNetSource) mangaSearchPostList(document *element.Element) [
 	return mangaList
 }
 
-func (is *FrenchMangaNetSource) MangaArticle(link string) *schema.MovieArticle {
-	response, err := is.Get(link)
+func (is *FrenchMangaNetSource) MangaArticle(ctx context.Context, link string) *schema.MovieArticle {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, link, nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -133,17 +137,6 @@ func (is *FrenchMangaNetSource) MangaArticle(link string) *schema.MovieArticle {
 func (is *FrenchMangaNetSource) mangaArticle(document *element.Element) *schema.MovieArticle {
 	articleSelector := is.MangaSerieArticleSelector
 	description := document.ChildText(articleSelector.Description[0])
-	// imdb := document.ChildText(articleSelector.Imdb[0])
-
-	// var date string
-	// document.ForEachWithBreak(articleSelector.Date[0],
-	// 	func(i int, e *element.Element) bool {
-	// 		if strings.Contains(e.ChildText("span"), "sortie") {
-	// 			date = strings.TrimSpace(e.Selection.Contents().Not("span").Text())
-	// 			return false
-	// 		}
-	// 		return true
-	// 	})
 
 	genders := make([]string, 0)
 	document.ForEachWithBreak(articleSelector.Genders[0],

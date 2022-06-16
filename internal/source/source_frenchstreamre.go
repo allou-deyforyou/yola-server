@@ -34,14 +34,15 @@ func (is *FrenchStreamReSource) FilmLatestPost(ctx context.Context, page int) []
 	if err != nil {
 		return nil
 	}
+	defer response.Body.Close()
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		return nil
 	}
-	return is.filmLatestPostList(element.NewElement(document.Selection))
+	return is.filmLatestPost(element.NewElement(document.Selection))
 }
 
-func (is *FrenchStreamReSource) filmLatestPostList(document *element.Element) []schema.MoviePost {
+func (is *FrenchStreamReSource) filmLatestPost(document *element.Element) []schema.MoviePost {
 	selector := is.FilmLatestPostSelector
 	filmList := make([]schema.MoviePost, 0)
 	document.ForEach(selector.List[0],
@@ -67,10 +68,10 @@ func (is *FrenchStreamReSource) filmLatestPostList(document *element.Element) []
 	return filmList
 }
 
-func (is *FrenchStreamReSource) FilmSearchPostList(query string, page int) []schema.MoviePost {
-	response, err := is.PostForm(
+func (is *FrenchStreamReSource) FilmSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet,
 		fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.FilmSearchURL, page)),
-		url.Values{
+		strings.NewReader(url.Values{
 			"do":           []string{"search"},
 			"subaction":    []string{"search"},
 			"story":        []string{query},
@@ -86,8 +87,9 @@ func (is *FrenchStreamReSource) FilmSearchPostList(query string, page int) []sch
 			"resorder":     []string{"desc"},
 			"showposts":    []string{"0"},
 			"catlist[]":    []string{"9"},
-		},
-	)
+		}.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -95,10 +97,10 @@ func (is *FrenchStreamReSource) FilmSearchPostList(query string, page int) []sch
 	if err != nil {
 		return nil
 	}
-	return is.filmSearchPostList(element.NewElement(document.Selection))
+	return is.filmSearchPost(element.NewElement(document.Selection))
 }
 
-func (is *FrenchStreamReSource) filmSearchPostList(document *element.Element) []schema.MoviePost {
+func (is *FrenchStreamReSource) filmSearchPost(document *element.Element) []schema.MoviePost {
 	selector := is.FilmSearchPostSelector
 	filmList := make([]schema.MoviePost, 0)
 	document.ForEach(selector.List[0],
@@ -124,8 +126,9 @@ func (is *FrenchStreamReSource) filmSearchPostList(document *element.Element) []
 	return filmList
 }
 
-func (is *FrenchStreamReSource) SerieLatestPostList(page int) []schema.MoviePost {
-	response, err := is.Get(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.SerieLatestURL, page)))
+func (is *FrenchStreamReSource) SerieLatestPost(ctx context.Context, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.SerieLatestURL, page)), nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -134,10 +137,10 @@ func (is *FrenchStreamReSource) SerieLatestPostList(page int) []schema.MoviePost
 	if err != nil {
 		return nil
 	}
-	return is.serieLatestPostList(element.NewElement(document.Selection))
+	return is.serieLatestPost(element.NewElement(document.Selection))
 }
 
-func (is *FrenchStreamReSource) serieLatestPostList(document *element.Element) []schema.MoviePost {
+func (is *FrenchStreamReSource) serieLatestPost(document *element.Element) []schema.MoviePost {
 	selector := is.SerieLatestPostSelector
 	serieList := make([]schema.MoviePost, 0)
 	document.ForEach(selector.List[0],
@@ -163,10 +166,10 @@ func (is *FrenchStreamReSource) serieLatestPostList(document *element.Element) [
 	return serieList
 }
 
-func (is *FrenchStreamReSource) SerieSearchPostList(query string, page int) []schema.MoviePost {
-	response, err := is.PostForm(
+func (is *FrenchStreamReSource) SerieSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet,
 		fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.SerieSearchURL, page)),
-		url.Values{
+		strings.NewReader(url.Values{
 			"do":           []string{"search"},
 			"subaction":    []string{"search"},
 			"story":        []string{query},
@@ -182,8 +185,9 @@ func (is *FrenchStreamReSource) SerieSearchPostList(query string, page int) []sc
 			"resorder":     []string{"desc"},
 			"showposts":    []string{"0"},
 			"catlist[]":    []string{"10"},
-		},
+		}.Encode()),
 	)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -192,10 +196,10 @@ func (is *FrenchStreamReSource) SerieSearchPostList(query string, page int) []sc
 	if err != nil {
 		return nil
 	}
-	return is.serieSearchPostList(element.NewElement(document.Selection))
+	return is.serieSearchPost(element.NewElement(document.Selection))
 }
 
-func (is *FrenchStreamReSource) serieSearchPostList(document *element.Element) []schema.MoviePost {
+func (is *FrenchStreamReSource) serieSearchPost(document *element.Element) []schema.MoviePost {
 	selector := is.SerieSearchPostSelector
 	serieList := make([]schema.MoviePost, 0)
 	document.ForEach(selector.List[0],
@@ -217,8 +221,9 @@ func (is *FrenchStreamReSource) serieSearchPostList(document *element.Element) [
 	return serieList
 }
 
-func (is *FrenchStreamReSource) FilmArticle(link string) *schema.MovieArticle {
-	response, err := is.Get(link)
+func (is *FrenchStreamReSource) FilmArticle(ctx context.Context, link string) *schema.MovieArticle {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, link, nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -289,8 +294,9 @@ func (is *FrenchStreamReSource) filmArticle(document *element.Element) *schema.M
 	}
 }
 
-func (is *FrenchStreamReSource) SerieArticle(link string) *schema.MovieArticle {
-	response, err := is.Get(link)
+func (is *FrenchStreamReSource) SerieArticle(ctx context.Context, link string) *schema.MovieArticle {
+	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, link, nil)
+	response, err := is.Do(request)
 	if err != nil {
 		return nil
 	}
@@ -306,17 +312,6 @@ func (is *FrenchStreamReSource) serieArticle(document *element.Element) *schema.
 	articleSelector := is.SerieArticleSelector
 
 	description := document.ChildText(articleSelector.Description[0])
-	// imdb := document.ChildText(articleSelector.Imdb[0])
-
-	// var date string
-	// document.ForEachWithBreak(articleSelector.Date[0],
-	// 	func(i int, e *element.Element) bool {
-	// 		if strings.Contains(e.ChildText("span"), "sortie") {
-	// 			date = strings.TrimSpace(e.Selection.Contents().Not("span").Text())
-	// 			return false
-	// 		}
-	// 		return true
-	// 	})
 
 	genders := make([]string, 0)
 	document.ForEachWithBreak(articleSelector.Genders[0],
