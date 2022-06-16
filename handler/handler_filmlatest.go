@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/go-rod/rod"
@@ -12,7 +12,7 @@ func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("https://vostfree.tv")
-	log.Println(page.HTML())
+	fmt.Println(page.MustHTML())
 	// ctx, cancel := context.WithTimeout(
 	// 	context.Background(),
 	// 	10*time.Second,
