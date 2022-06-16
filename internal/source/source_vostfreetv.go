@@ -30,11 +30,11 @@ func chromeRequest(url string) (io.Reader, error) {
 	defer cancel()
 
 	var response string
-	chromedp.Run(ctx,
+	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.InnerHTML("body", &response),
 	)
-	return strings.NewReader(response), nil
+	return strings.NewReader(response), err
 }
 
 func rodRequest(url string) (io.Reader, error) {
@@ -158,6 +158,7 @@ func (is *VostfreeTvSource) MangaArticle(_ context.Context, link string) *schema
 
 func (is *VostfreeTvSource) mangaArticle(document *element.Element) *schema.MovieArticle {
 	articleSelector := is.MangaSerieArticleSelector
+	fmt.Println(document.Content())
 
 	description := document.ChildText(articleSelector.Description[0])
 	genders := document.ChildTexts(articleSelector.Genders[0])
