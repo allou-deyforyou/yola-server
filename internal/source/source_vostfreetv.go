@@ -14,30 +14,11 @@ import (
 	"yola/internal/entdata/schema"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/chromedp"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 )
 
-func chromeRequest(url string) (io.Reader, error) {
-	opts := []chromedp.ExecAllocatorOption{
-		chromedp.NoSandbox,
-	}
-
-	allCtx, allCancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer allCancel()
-	ctx, cancel := chromedp.NewContext(allCtx)
-	defer cancel()
-
-	var response string
-	err := chromedp.Run(ctx,
-		chromedp.Navigate(url),
-		chromedp.InnerHTML("body", &response, chromedp.NodeVisible),
-	)
-	return strings.NewReader(response), err
-}
-
-func rodRequest(url string) (io.Reader, error) {
+func rodGetRequest(url string) (io.Reader, error) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage(url)
@@ -57,7 +38,7 @@ func NewVostfreeTvSource(source *entdata.MovieSource) *VostfreeTvSource {
 }
 
 func (is *VostfreeTvSource) MangaLatestPost(_ context.Context, page int) []schema.MoviePost {
-	response, err := rodRequest(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
+	response, err := rodGetRequest(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
 	if err != nil {
 		return nil
 	}
@@ -111,6 +92,7 @@ func (is *VostfreeTvSource) MangaSearchPost(ctx context.Context, query string, p
 		}.Encode()),
 	)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36")
 	response, err := is.Do(request)
 	if err != nil {
 		return nil
@@ -145,7 +127,7 @@ func (is *VostfreeTvSource) mangaSearchPostList(document *element.Element) []sch
 }
 
 func (is *VostfreeTvSource) MangaArticle(_ context.Context, link string) *schema.MovieArticle {
-	response, err := rodRequest(link)
+	response, err := rodGetRequest(link)
 	if err != nil {
 		return nil
 	}
