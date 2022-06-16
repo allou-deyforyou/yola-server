@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
-	page := rod.New().MustConnect().MustPage("https://vostfree.tv")
+	path, _ := launcher.LookPath()
+	u := launcher.New().Bin(path).MustLaunch()
+	page := rod.New().ControlURL(u).MustConnect().MustPage("https://vostfree.tv")
 	log.Println(page.HTML())
 	// ctx, cancel := context.WithTimeout(
 	// 	context.Background(),
