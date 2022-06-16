@@ -8,7 +8,7 @@ ADD ./yola.db  /build/
 
 WORKDIR /build
 
-CMD ["./server"]
+CMD ["/build/server"]
 
 # RUN CGO_ENABLED=1 GOOS=linux go build -o server -a -ldflags '-linkmode external -extldflags "-static"'
 
