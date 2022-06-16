@@ -10,7 +10,7 @@ import (
 
 func (h *Handler) FilmLatestPost(w http.ResponseWriter, r *http.Request) {
 	path, _ := launcher.LookPath()
-	u := launcher.New().Bin(path).MustLaunch()
+	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
 	page := rod.New().ControlURL(u).MustConnect().MustPage("https://vostfree.tv")
 	log.Println(page.HTML())
 	// ctx, cancel := context.WithTimeout(
