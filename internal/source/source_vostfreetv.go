@@ -19,69 +19,12 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 )
 
-var browser *rod.Browser
-
-func init() {
-	path, _ := launcher.LookPath()
-	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
-	browser = rod.New().ControlURL(u).MustConnect()
-}
-
-// func chromePostRequest(url string, data string) (io.Reader, error) {
-// 	opts := []chromedp.ExecAllocatorOption{
-// 		chromedp.NoDefaultBrowserCheck,
-// 		chromedp.Headless,
-// 		chromedp.DisableGPU,
-// 		chromedp.NoSandbox,
-// 	}
-
-// 	allCtx, allCancel := chromedp.NewExecAllocator(context.Background(), opts...)
-// 	defer allCancel()
-
-// 	ctx, cancel := chromedp.NewContext(allCtx)
-// 	defer cancel()
-// 	var response string
-// 	err := chromedp.Run(ctx,
-// 		chromedp.Navigate(url),
-// 		chromedp.Evaluate(fmt.Sprintf(`
-// 			function postData() {
-// 				let xhr = new XMLHttpRequest();
-// 				xhr.open('POST', '%v', false);
-// 				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-// 				try {
-// 					xhr.send('%v');
-// 				} catch (e) {
-// 					return e;
-// 				}
-// 				return xhr.response;
-// 			}; postData();
-// 		`, url, data), &response),
-// 	)
-// 	return strings.NewReader(response), err
-// }
-
-// func chromeGetRequest(url string) (io.Reader, error) {
-// 	opts := []chromedp.ExecAllocatorOption{
-// 		chromedp.NoDefaultBrowserCheck,
-// 		chromedp.Headless,
-// 		chromedp.DisableGPU,
-// 		chromedp.NoSandbox,
-// 	}
-
-// 	allCtx, allCancel := chromedp.NewExecAllocator(context.Background(), opts...)
-// 	defer allCancel()
-
-// 	ctx, cancel := chromedp.NewContext(allCtx)
-// 	defer cancel()
-// 	var response string
-// 	err := chromedp.Run(ctx,
-// 		chromedp.Navigate(url),
-// 		chromedp.OuterHTML("html", &response),
-// 	)
-// 	return strings.NewReader(response), err
-// }
 
 func rodPostRequest(url string, data string) (io.Reader, error) {
+	path, _ := launcher.LookPath()
+	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
+	browser := rod.New().NoDefaultDevice().ControlURL(u).MustConnect()
+	defer browser.Close()
 	response := browser.MustPage(url).MustEval(`
 	(url, data) => {
 		let xhr = new XMLHttpRequest();
@@ -89,7 +32,7 @@ func rodPostRequest(url string, data string) (io.Reader, error) {
 		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 		try {
 			xhr.send(data);
-		} catch (e) {
+			} catch (e) {
 			return e;
 		}
 		return xhr.response;
@@ -99,6 +42,10 @@ func rodPostRequest(url string, data string) (io.Reader, error) {
 }
 
 func rodGetRequest(url string) (io.Reader, error) {
+	path, _ := launcher.LookPath()
+	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
+	browser := rod.New().NoDefaultDevice().ControlURL(u).MustConnect()
+	defer browser.Close()
 	page := browser.MustPage(url)
 	return strings.NewReader(page.MustElement("body").MustHTML()), nil
 }
