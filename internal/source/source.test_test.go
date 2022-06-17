@@ -159,7 +159,7 @@ func TestCreateVostfreeTvSource(t *testing.T) {
 			List:  []string{"#dle-content .search-result"},
 		}).
 		SetMangaSerieArticleSelector(&schema.MovieArticleSelector{
-			Hosters:     []string{".new_player_bottom > div", ".slide-middle"},
+			Hosters:     []string{".new_player_selector option", ".new_player_bottom"},
 			Genders:     []string{".slide-top li.right a"},
 			Date:        []string{".slide-info p"},
 			Description: []string{".slide-desc"},

@@ -177,28 +177,31 @@ func (is *VostfreeTvSource) mangaArticle(document *element.Element) *schema.Movi
 	videos := make([]schema.MovieVideo, 0)
 	document.ForEach(articleSelector.Hosters[0],
 		func(i int, e *element.Element) {
+			id := e.Attribute("value")
 			subtitleHosters := make([]string, 0)
 			hosters := make([]string, 0)
-			e.ForEach("div", func(i int, e *element.Element) {
-				name := strings.ToLower(e.Text())
-				link := document.ChildText(fmt.Sprintf("#content_%v", e.Attribute("id")))
-				switch name {
-				case "sibnet":
-					link = fmt.Sprintf("https://video.sibnet.ru/shell.php?videoid=%v", link)
-				case "uqload":
-					link = fmt.Sprintf("https://uqload.com/embed-%v.html", link)
-				case "mytv":
-					link = fmt.Sprintf("https://www.myvi.tv/embed/%v", link)
-				}
-				if strings.Contains(strings.ToLower(document.ChildText(articleSelector.Hosters[1])), "vostfr") {
-					subtitleHosters = append(subtitleHosters, link)
-				} else {
-					hosters = append(hosters, link)
-				}
-			})
+			document.ForEach(
+				fmt.Sprintf("%v #%v div", articleSelector.Hosters[1], id),
+				func(i int, e *element.Element) {
+					name := strings.ToLower(e.Text())
+					link := document.ChildText(fmt.Sprintf("#content_%v", e.Attribute("id")))
+					switch name {
+					case "sibnet":
+						link = fmt.Sprintf("https://video.sibnet.ru/shell.php?videoid=%v", link)
+					case "uqload":
+						link = fmt.Sprintf("https://uqload.com/embed-%v.html", link)
+					case "mytv":
+						link = fmt.Sprintf("https://www.myvi.tv/embed/%v", link)
+					}
+					if strings.Contains(strings.ToLower(document.ChildText(articleSelector.Hosters[1])), "vostfr") {
+						subtitleHosters = append(subtitleHosters, link)
+					} else {
+						hosters = append(hosters, link)
+					}
+				})
 			videos = append(videos, schema.MovieVideo{
-				Name:            document.ChildText(fmt.Sprintf(".new_player_selector option:nth-child(%v)", i+1)),
 				SubtitleHosters: subtitleHosters,
+				Name:            e.Text(),
 				Hosters:         hosters,
 			})
 		})
