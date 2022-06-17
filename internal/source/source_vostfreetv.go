@@ -26,6 +26,7 @@ func rodPostRequest(url string, data string) (io.Reader, error) {
 		let xhr = new XMLHttpRequest();
 		xhr.open('POST', url, false);
 		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		xhr.setRequestHeader('Origin', url);
 		try {
 			xhr.send(data);
 		} catch (e) {
@@ -34,6 +35,7 @@ func rodPostRequest(url string, data string) (io.Reader, error) {
 		return xhr.response;
 	}
 	`, url, data).String()
+
 	return strings.NewReader(response), nil
 }
 
