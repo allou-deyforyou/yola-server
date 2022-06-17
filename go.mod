@@ -5,6 +5,7 @@ go 1.18
 require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/chromedp/cdproto v0.0.0-20220515234810-83d799542a04
 	github.com/chromedp/chromedp v0.8.2
 	github.com/mattn/go-sqlite3 v1.14.10
 )
@@ -14,7 +15,6 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/chromedp/cdproto v0.0.0-20220515234810-83d799542a04 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect

@@ -14,6 +14,7 @@ import (
 	"yola/internal/entdata/schema"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 )
 
@@ -45,7 +46,9 @@ func chromePostRequest(url string, data string) (io.Reader, error) {
 				}
 				return xhr.response;
 			}; postData();
-		`, url, data), &response),
+		`, url, data), &response, func(ep *runtime.EvaluateParams) *runtime.EvaluateParams {
+			return ep.WithAwaitPromise(true)
+		}),
 	)
 	return strings.NewReader(response), err
 }
