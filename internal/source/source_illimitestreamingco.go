@@ -162,7 +162,7 @@ func (is *Illimitestreamingco) filmArticle(document *element.Element) *schema.Mo
 	videos = append(videos, schema.MovieVideo{
 		SubtitleHosters: subtitleHosters,
 		Hosters:         hosters,
-		Name:            "Film",
+		Name:            "Video",
 	})
 
 	if len(genders) == 0 {
@@ -172,7 +172,7 @@ func (is *Illimitestreamingco) filmArticle(document *element.Element) *schema.Mo
 		Description: description,
 		Genders:     genders,
 		Sections: []schema.MovieSectionVideo{
-			{Name: "Episodes", Videos: videos},
+			{Name: "Film", Videos: videos},
 		},
 		Imdb: imdb,
 		Date: date,
