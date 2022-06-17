@@ -19,11 +19,10 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 )
 
-
 func rodPostRequest(url string, data string) (io.Reader, error) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
-	browser := rod.New().NoDefaultDevice().ControlURL(u).MustConnect()
+	browser := rod.New().ControlURL(u).MustConnect()
 	defer browser.Close()
 	response := browser.MustPage(url).MustEval(`
 	(url, data) => {
@@ -44,7 +43,7 @@ func rodPostRequest(url string, data string) (io.Reader, error) {
 func rodGetRequest(url string) (io.Reader, error) {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
-	browser := rod.New().NoDefaultDevice().ControlURL(u).MustConnect()
+	browser := rod.New().ControlURL(u).MustConnect()
 	defer browser.Close()
 	page := browser.MustPage(url)
 	return strings.NewReader(page.MustElement("body").MustHTML()), nil
