@@ -14,36 +14,61 @@ import (
 	"yola/internal/entdata/schema"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/launcher"
+	"github.com/chromedp/chromedp"
 )
 
-func rodPostRequest(url string, data string) (io.Reader, error) {
-	path, _ := launcher.LookPath()
-	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
-	response := rod.New().ControlURL(u).MustConnect().MustPage(url).MustEval(`
-	(url, data) => {
-		let xhr = new XMLHttpRequest();
-		xhr.open('POST', url, false);
-		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-		xhr.setRequestHeader('Origin', url);
-		try {
-			xhr.send(data);
-		} catch (e) {
-			return e;
-		}
-		return xhr.response;
+func chromePostRequest(url string, data string) (io.Reader, error) {
+	opts := []chromedp.ExecAllocatorOption{
+		chromedp.NoDefaultBrowserCheck,
+		chromedp.Headless,
+		chromedp.DisableGPU,
+		chromedp.NoSandbox,
 	}
-	`, url, data).Str()
 
-	return strings.NewReader(response), nil
+	allCtx, allCancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer allCancel()
+
+	ctx, cancel := chromedp.NewContext(allCtx)
+	defer cancel()
+	var response string
+	err := chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		chromedp.Evaluate(fmt.Sprintf(`
+			function postData() {
+				let xhr = new XMLHttpRequest();
+				xhr.open('POST', '%v', false);
+				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+				try {
+					xhr.send('%v');
+				} catch (e) {
+					return e;
+				}
+				return xhr.response;
+			}; postData();
+		`, url, data), &response),
+	)
+	return strings.NewReader(response), err
 }
 
-func rodGetRequest(url string) (io.Reader, error) {
-	path, _ := launcher.LookPath()
-	u := launcher.New().Bin(path).NoSandbox(true).MustLaunch()
-	page := rod.New().ControlURL(u).MustConnect().MustPage(url)
-	return strings.NewReader(page.MustElement("body").MustHTML()), nil
+func chromeGetRequest(url string) (io.Reader, error) {
+	opts := []chromedp.ExecAllocatorOption{
+		chromedp.NoDefaultBrowserCheck,
+		chromedp.Headless,
+		chromedp.DisableGPU,
+		chromedp.NoSandbox,
+	}
+
+	allCtx, allCancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer allCancel()
+
+	ctx, cancel := chromedp.NewContext(allCtx)
+	defer cancel()
+	var response string
+	err := chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		chromedp.OuterHTML("html", &response),
+	)
+	return strings.NewReader(response), err
 }
 
 type VostfreeTvSource struct {
@@ -59,7 +84,7 @@ func NewVostfreeTvSource(source *entdata.MovieSource) *VostfreeTvSource {
 }
 
 func (is *VostfreeTvSource) MangaLatestPost(_ context.Context, page int) []schema.MoviePost {
-	response, err := rodGetRequest(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
+	response, err := chromeGetRequest(fmt.Sprintf("%s%s", is.URL, fmt.Sprintf(*is.MangaSerieLatestURL, page)))
 	if err != nil {
 		return nil
 	}
@@ -92,7 +117,7 @@ func (is *VostfreeTvSource) mangaLatestPostList(document *element.Element) []sch
 }
 
 func (is *VostfreeTvSource) MangaSearchPost(ctx context.Context, query string, page int) []schema.MoviePost {
-	response, err := rodPostRequest(
+	response, err := chromePostRequest(
 		fmt.Sprintf("%s%s", is.URL, *is.MangaSerieSearchURL),
 		url.Values{
 			"do":           []string{"search"},
@@ -144,7 +169,7 @@ func (is *VostfreeTvSource) mangaSearchPostList(document *element.Element) []sch
 }
 
 func (is *VostfreeTvSource) MangaArticle(_ context.Context, link string) *schema.MovieArticle {
-	response, err := rodGetRequest(link)
+	response, err := chromeGetRequest(link)
 	if err != nil {
 		return nil
 	}
