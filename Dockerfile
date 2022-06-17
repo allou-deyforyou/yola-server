@@ -8,16 +8,16 @@ ADD ./ /build/
 WORKDIR /build
 
 RUN go mod download
-RUN GOPROXY=https://goproxy.io,direct go build -o server
+RUN go build -o server
 
 FROM chromedp/headless-shell:latest
 
-RUN apt-get update; apt-get upgrade; apt install dumb-init
+RUN apt-get update; apt-get upgrade; apt install -y dumb-init
 
 ENTRYPOINT ["dumb-init", "--"]
 
-COPY --from=build ./server /app/
-COPY --from=build ./yola.db /app/
+COPY --from=build /build/server /app/
+COPY --from=build /build/yola.db /app/
 
 WORKDIR /app
 
