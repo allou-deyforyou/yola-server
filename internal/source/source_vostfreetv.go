@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -141,6 +142,7 @@ func (is *VostfreeTvSource) MangaSearchPost(ctx context.Context, query string, p
 		}.Encode(),
 	)
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 	document, err := goquery.NewDocumentFromReader(response)
