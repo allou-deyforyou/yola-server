@@ -197,7 +197,7 @@ func (is *VostfreeTvSource) mangaArticle(document *element.Element) *schema.Movi
 				}
 			})
 			videos = append(videos, schema.MovieVideo{
-				Name:            strconv.Itoa(i + 1),
+				Name:            document.ChildText(fmt.Sprintf(".new_player_selector option:nth-child(%v)", i+1)),
 				SubtitleHosters: subtitleHosters,
 				Hosters:         hosters,
 			})
