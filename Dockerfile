@@ -20,4 +20,4 @@ COPY --from=build /build/yola.db /app/
 
 WORKDIR /app
 
-CMD ["/app/server"]
+CMD ["server"]
