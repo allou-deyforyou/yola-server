@@ -34,7 +34,7 @@ func rodPostRequest(url string, data string) (io.Reader, error) {
 		}
 		return xhr.response;
 	}
-	`, url, data).String()
+	`, url, data).Str()
 
 	return strings.NewReader(response), nil
 }
