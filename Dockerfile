@@ -1,6 +1,6 @@
 FROM golang:1.18.3-alpine as build
 
-RUN apk add build-base
+RUN apk add gcc
 
 RUN mkdir /build
 ADD ./ /build/
@@ -12,7 +12,7 @@ RUN GOPROXY=https://goproxy.io,direct go build -o server
 
 FROM chromedp/headless-shell:latest
 
-RUN apt update; apt upgrade; apt install dumb-init
+RUN apt-get update; apt-get upgrade; apt install dumb-init
 
 ENTRYPOINT ["dumb-init", "--"]
 
