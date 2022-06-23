@@ -332,6 +332,20 @@ func (msu *MovieSourceUpdate) ClearFilmArticleSelector() *MovieSourceUpdate {
 	return msu
 }
 
+// SetLanguage sets the "language" field.
+func (msu *MovieSourceUpdate) SetLanguage(s string) *MovieSourceUpdate {
+	msu.mutation.SetLanguage(s)
+	return msu
+}
+
+// SetNillableLanguage sets the "language" field if the given value is not nil.
+func (msu *MovieSourceUpdate) SetNillableLanguage(s *string) *MovieSourceUpdate {
+	if s != nil {
+		msu.SetLanguage(*s)
+	}
+	return msu
+}
+
 // SetStatus sets the "status" field.
 func (msu *MovieSourceUpdate) SetStatus(b bool) *MovieSourceUpdate {
 	msu.mutation.SetStatus(b)
@@ -695,6 +709,13 @@ func (msu *MovieSourceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: moviesource.FieldFilmArticleSelector,
 		})
 	}
+	if value, ok := msu.mutation.Language(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: moviesource.FieldLanguage,
+		})
+	}
 	if value, ok := msu.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -1036,6 +1057,20 @@ func (msuo *MovieSourceUpdateOne) SetFilmArticleSelector(sas *schema.MovieArticl
 // ClearFilmArticleSelector clears the value of the "film_article_selector" field.
 func (msuo *MovieSourceUpdateOne) ClearFilmArticleSelector() *MovieSourceUpdateOne {
 	msuo.mutation.ClearFilmArticleSelector()
+	return msuo
+}
+
+// SetLanguage sets the "language" field.
+func (msuo *MovieSourceUpdateOne) SetLanguage(s string) *MovieSourceUpdateOne {
+	msuo.mutation.SetLanguage(s)
+	return msuo
+}
+
+// SetNillableLanguage sets the "language" field if the given value is not nil.
+func (msuo *MovieSourceUpdateOne) SetNillableLanguage(s *string) *MovieSourceUpdateOne {
+	if s != nil {
+		msuo.SetLanguage(*s)
+	}
 	return msuo
 }
 
@@ -1424,6 +1459,13 @@ func (msuo *MovieSourceUpdateOne) sqlSave(ctx context.Context) (_node *MovieSour
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Column: moviesource.FieldFilmArticleSelector,
+		})
+	}
+	if value, ok := msuo.mutation.Language(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: moviesource.FieldLanguage,
 		})
 	}
 	if value, ok := msuo.mutation.Status(); ok {

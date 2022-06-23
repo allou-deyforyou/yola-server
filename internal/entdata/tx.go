@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// MovieSource is the client for interacting with the MovieSource builders.
 	MovieSource *MovieSourceClient
+	// Tv is the client for interacting with the Tv builders.
+	Tv *TvClient
 
 	// lazily loaded.
 	client     *Client
@@ -150,6 +152,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.MovieSource = NewMovieSourceClient(tx.config)
+	tx.Tv = NewTvClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

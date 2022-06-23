@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"yola/internal/entdata/moviesource"
+	"yola/internal/entdata/tv"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -32,6 +33,7 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		moviesource.Table: moviesource.ValidColumn,
+		tv.Table:          tv.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

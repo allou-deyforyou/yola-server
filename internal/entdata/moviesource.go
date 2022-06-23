@@ -57,6 +57,8 @@ type MovieSource struct {
 	SerieArticleSelector *schema.MovieArticleSelector `json:"serie_article_selector,omitempty"`
 	// FilmArticleSelector holds the value of the "film_article_selector" field.
 	FilmArticleSelector *schema.MovieArticleSelector `json:"film_article_selector,omitempty"`
+	// Language holds the value of the "language" field.
+	Language string `json:"language,omitempty"`
 	// Status holds the value of the "status" field.
 	Status bool `json:"status,omitempty"`
 	// Name holds the value of the "name" field.
@@ -76,7 +78,7 @@ func (*MovieSource) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case moviesource.FieldID:
 			values[i] = new(sql.NullInt64)
-		case moviesource.FieldMangaSerieSearchURL, moviesource.FieldMangaFilmSearchURL, moviesource.FieldSerieSearchURL, moviesource.FieldFilmSearchURL, moviesource.FieldMangaSerieLatestURL, moviesource.FieldMangaFilmLatestURL, moviesource.FieldSerieLatestURL, moviesource.FieldFilmLatestURL, moviesource.FieldName, moviesource.FieldURL:
+		case moviesource.FieldMangaSerieSearchURL, moviesource.FieldMangaFilmSearchURL, moviesource.FieldSerieSearchURL, moviesource.FieldFilmSearchURL, moviesource.FieldMangaSerieLatestURL, moviesource.FieldMangaFilmLatestURL, moviesource.FieldSerieLatestURL, moviesource.FieldFilmLatestURL, moviesource.FieldLanguage, moviesource.FieldName, moviesource.FieldURL:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type MovieSource", columns[i])
@@ -251,6 +253,12 @@ func (ms *MovieSource) assignValues(columns []string, values []interface{}) erro
 					return fmt.Errorf("unmarshal field film_article_selector: %w", err)
 				}
 			}
+		case moviesource.FieldLanguage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field language", values[i])
+			} else if value.Valid {
+				ms.Language = value.String
+			}
 		case moviesource.FieldStatus:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
@@ -353,6 +361,8 @@ func (ms *MovieSource) String() string {
 	builder.WriteString(fmt.Sprintf("%v", ms.SerieArticleSelector))
 	builder.WriteString(", film_article_selector=")
 	builder.WriteString(fmt.Sprintf("%v", ms.FilmArticleSelector))
+	builder.WriteString(", language=")
+	builder.WriteString(ms.Language)
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", ms.Status))
 	builder.WriteString(", name=")

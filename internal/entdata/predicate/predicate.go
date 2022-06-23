@@ -8,3 +8,6 @@ import (
 
 // MovieSource is the predicate function for moviesource builders.
 type MovieSource func(*sql.Selector)
+
+// Tv is the predicate function for tv builders.
+type Tv func(*sql.Selector)

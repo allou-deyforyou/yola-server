@@ -147,6 +147,13 @@ func FilmLatestURL(v string) predicate.MovieSource {
 	})
 }
 
+// Language applies equality check predicate on the "language" field. It's identical to LanguageEQ.
+func Language(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLanguage), v))
+	})
+}
+
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v bool) predicate.MovieSource {
 	return predicate.MovieSource(func(s *sql.Selector) {
@@ -1333,6 +1340,117 @@ func FilmArticleSelectorIsNil() predicate.MovieSource {
 func FilmArticleSelectorNotNil() predicate.MovieSource {
 	return predicate.MovieSource(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldFilmArticleSelector)))
+	})
+}
+
+// LanguageEQ applies the EQ predicate on the "language" field.
+func LanguageEQ(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageNEQ applies the NEQ predicate on the "language" field.
+func LanguageNEQ(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageIn applies the In predicate on the "language" field.
+func LanguageIn(vs ...string) predicate.MovieSource {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MovieSource(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldLanguage), v...))
+	})
+}
+
+// LanguageNotIn applies the NotIn predicate on the "language" field.
+func LanguageNotIn(vs ...string) predicate.MovieSource {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MovieSource(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldLanguage), v...))
+	})
+}
+
+// LanguageGT applies the GT predicate on the "language" field.
+func LanguageGT(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageGTE applies the GTE predicate on the "language" field.
+func LanguageGTE(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageLT applies the LT predicate on the "language" field.
+func LanguageLT(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageLTE applies the LTE predicate on the "language" field.
+func LanguageLTE(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageContains applies the Contains predicate on the "language" field.
+func LanguageContains(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageHasPrefix applies the HasPrefix predicate on the "language" field.
+func LanguageHasPrefix(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageHasSuffix applies the HasSuffix predicate on the "language" field.
+func LanguageHasSuffix(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageEqualFold applies the EqualFold predicate on the "language" field.
+func LanguageEqualFold(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldLanguage), v))
+	})
+}
+
+// LanguageContainsFold applies the ContainsFold predicate on the "language" field.
+func LanguageContainsFold(v string) predicate.MovieSource {
+	return predicate.MovieSource(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldLanguage), v))
 	})
 }
 

@@ -5,6 +5,7 @@ package entdata
 import (
 	"yola/internal/entdata/moviesource"
 	"yola/internal/entdata/schema"
+	"yola/internal/entdata/tv"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -13,8 +14,42 @@ import (
 func init() {
 	moviesourceFields := schema.MovieSource{}.Fields()
 	_ = moviesourceFields
+	// moviesourceDescLanguage is the schema descriptor for language field.
+	moviesourceDescLanguage := moviesourceFields[20].Descriptor()
+	// moviesource.DefaultLanguage holds the default value on creation for the language field.
+	moviesource.DefaultLanguage = moviesourceDescLanguage.Default.(string)
 	// moviesourceDescStatus is the schema descriptor for status field.
-	moviesourceDescStatus := moviesourceFields[20].Descriptor()
+	moviesourceDescStatus := moviesourceFields[21].Descriptor()
 	// moviesource.DefaultStatus holds the default value on creation for the status field.
 	moviesource.DefaultStatus = moviesourceDescStatus.Default.(bool)
+	tvFields := schema.Tv{}.Fields()
+	_ = tvFields
+	// tvDescLogo is the schema descriptor for logo field.
+	tvDescLogo := tvFields[0].Descriptor()
+	// tv.LogoValidator is a validator for the "logo" field. It is called by the builders before save.
+	tv.LogoValidator = tvDescLogo.Validators[0].(func(string) error)
+	// tvDescVideo is the schema descriptor for video field.
+	tvDescVideo := tvFields[1].Descriptor()
+	// tv.VideoValidator is a validator for the "video" field. It is called by the builders before save.
+	tv.VideoValidator = tvDescVideo.Validators[0].(func(string) error)
+	// tvDescTitle is the schema descriptor for title field.
+	tvDescTitle := tvFields[2].Descriptor()
+	// tv.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	tv.TitleValidator = tvDescTitle.Validators[0].(func(string) error)
+	// tvDescStatus is the schema descriptor for status field.
+	tvDescStatus := tvFields[3].Descriptor()
+	// tv.DefaultStatus holds the default value on creation for the status field.
+	tv.DefaultStatus = tvDescStatus.Default.(bool)
+	// tvDescCountry is the schema descriptor for country field.
+	tvDescCountry := tvFields[4].Descriptor()
+	// tv.DefaultCountry holds the default value on creation for the country field.
+	tv.DefaultCountry = tvDescCountry.Default.(string)
+	// tvDescDescription is the schema descriptor for description field.
+	tvDescDescription := tvFields[5].Descriptor()
+	// tv.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	tv.DescriptionValidator = tvDescDescription.Validators[0].(func(string) error)
+	// tvDescLanguage is the schema descriptor for language field.
+	tvDescLanguage := tvFields[6].Descriptor()
+	// tv.DefaultLanguage holds the default value on creation for the language field.
+	tv.DefaultLanguage = tvDescLanguage.Default.(string)
 }

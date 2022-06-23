@@ -47,6 +47,8 @@ const (
 	FieldSerieArticleSelector = "serie_article_selector"
 	// FieldFilmArticleSelector holds the string denoting the film_article_selector field in the database.
 	FieldFilmArticleSelector = "film_article_selector"
+	// FieldLanguage holds the string denoting the language field in the database.
+	FieldLanguage = "language"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldName holds the string denoting the name field in the database.
@@ -80,6 +82,7 @@ var Columns = []string{
 	FieldMangaFilmArticleSelector,
 	FieldSerieArticleSelector,
 	FieldFilmArticleSelector,
+	FieldLanguage,
 	FieldStatus,
 	FieldName,
 	FieldURL,
@@ -96,6 +99,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultLanguage holds the default value on creation for the "language" field.
+	DefaultLanguage string
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus bool
 )

@@ -58,6 +58,7 @@ func (MovieSource) Fields() []ent.Field {
 		field.JSON("film_article_selector", &MovieArticleSelector{}).
 			Optional(),
 
+		field.String("language").Default("fr"),
 		field.Bool("status").Default(true),
 		field.String("name").Unique(),
 		field.String("url"),

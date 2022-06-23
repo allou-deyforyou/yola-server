@@ -12,7 +12,7 @@ import (
 )
 
 func NewEntClient() *entdata.Client {
-	client, err := entdata.Open(dialect.SQLite, "yola.db?mode=memory&cache=shared&_fk=1")
+	client, err := entdata.Open(dialect.SQLite, "assets/files/yola.db?mode=memory&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatalf("failed connecting to sqlite: %v", err)
 	}

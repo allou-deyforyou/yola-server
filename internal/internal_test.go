@@ -1,4 +1,4 @@
-package source_test
+package internal_test
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 var entClient *entdata.Client
 
 func init() {
-	client, err := entdata.Open(dialect.SQLite, "../../yola.db?mode=memory&cache=shared&_fk=1")
+	client, err := entdata.Open(dialect.SQLite, "../assets/files/yola.db?mode=memory&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatalf("failed connecting to mysql: %v", err)
 	}
@@ -166,10 +166,51 @@ func TestCreateVostfreeTvSource(t *testing.T) {
 		}).Save(context.Background())
 }
 
+func TestCreateRti1TV(t *testing.T) {
+	entClient.Tv.Create().
+		SetStatus(true).
+		SetTitle("RTI 1").
+		SetVideo("https://www.enovativecdn.com/rticdn/smil:rti1.smil/playlist.m3u8").
+		SetLogo("https://rti.ci/_nuxt/img/6a12f31.svg").
+		SetDescription("RTI 1 est la première chaîne de télévision généraliste publique ivoirienne qui émet en continu depuis Abidjan.").
+		SaveX(context.Background())
+}
+
+func TestCreateRti2TV(t *testing.T) {
+	entClient.Tv.Create().
+		SetStatus(true).
+		SetTitle("RTI 2").
+		SetVideo("https://www.enovativecdn.com/rticdn/smil:rti2.smil/playlist.m3u8").
+		SetLogo("https://rti.ci/_nuxt/img/6d85e57.svg").
+		SetDescription("RTI 2 est une chaîne de télévision généraliste publique ivoirienne. Elle est consacrée à la jeunesse.").
+		SaveX(context.Background())
+
+}
+
+func TestCreateRti3TV(t *testing.T) {
+	entClient.Tv.Create().
+		SetStatus(true).
+		SetTitle("La 3").
+		SetVideo("https://www.enovativecdn.com/rticdn/smil:rti3.smil/playlist.m3u8").
+		SetLogo("https://rti.ci/_nuxt/img/4da62df.svg").
+		SetDescription("RTI 3, baptisée La 3, est une chaîne de télévision ivoirienne du Groupe RTI lancée le 16 février 2020.").
+		SaveX(context.Background())
+
+}
+
+func TestCreateNciTV(t *testing.T) {
+	entClient.Tv.Create().
+		SetStatus(true).
+		SetTitle("NCI").
+		SetVideo("https://nci-live.secure2.footprint.net/nci/nci.isml/.m3u8").
+		SetLogo("https://static.wixstatic.com/media/f8668c_8cf416367fb743378ec26c7e7978a318~mv2_d_1692_1295_s_2.png").
+		SetDescription("La Nouvelle Chaîne Ivoirienne, plus connue sous le sigle NCI est la première chaîne de télévision privée ivoirienne.").
+		SaveX(context.Background())
+}
+
 func TestGetSources(t *testing.T) {
 	log.Println(entClient.MovieSource.Query().AllX(context.Background()))
 }
-
 
 func TestRemoveSources(t *testing.T) {
 	log.Println(entClient.MovieSource.Delete().Where(moviesource.Name("vostfree-tv")).Exec(context.Background()))

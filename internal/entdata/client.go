@@ -10,6 +10,7 @@ import (
 	"yola/internal/entdata/migrate"
 
 	"yola/internal/entdata/moviesource"
+	"yola/internal/entdata/tv"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -22,6 +23,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// MovieSource is the client for interacting with the MovieSource builders.
 	MovieSource *MovieSourceClient
+	// Tv is the client for interacting with the Tv builders.
+	Tv *TvClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.MovieSource = NewMovieSourceClient(c.config)
+	c.Tv = NewTvClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -70,6 +74,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:         ctx,
 		config:      cfg,
 		MovieSource: NewMovieSourceClient(cfg),
+		Tv:          NewTvClient(cfg),
 	}, nil
 }
 
@@ -90,6 +95,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:         ctx,
 		config:      cfg,
 		MovieSource: NewMovieSourceClient(cfg),
+		Tv:          NewTvClient(cfg),
 	}, nil
 }
 
@@ -120,6 +126,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.MovieSource.Use(hooks...)
+	c.Tv.Use(hooks...)
 }
 
 // MovieSourceClient is a client for the MovieSource schema.
@@ -210,4 +217,94 @@ func (c *MovieSourceClient) GetX(ctx context.Context, id int) *MovieSource {
 // Hooks returns the client hooks.
 func (c *MovieSourceClient) Hooks() []Hook {
 	return c.hooks.MovieSource
+}
+
+// TvClient is a client for the Tv schema.
+type TvClient struct {
+	config
+}
+
+// NewTvClient returns a client for the Tv from the given config.
+func NewTvClient(c config) *TvClient {
+	return &TvClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tv.Hooks(f(g(h())))`.
+func (c *TvClient) Use(hooks ...Hook) {
+	c.hooks.Tv = append(c.hooks.Tv, hooks...)
+}
+
+// Create returns a create builder for Tv.
+func (c *TvClient) Create() *TvCreate {
+	mutation := newTvMutation(c.config, OpCreate)
+	return &TvCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tv entities.
+func (c *TvClient) CreateBulk(builders ...*TvCreate) *TvCreateBulk {
+	return &TvCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tv.
+func (c *TvClient) Update() *TvUpdate {
+	mutation := newTvMutation(c.config, OpUpdate)
+	return &TvUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TvClient) UpdateOne(t *Tv) *TvUpdateOne {
+	mutation := newTvMutation(c.config, OpUpdateOne, withTv(t))
+	return &TvUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TvClient) UpdateOneID(id int) *TvUpdateOne {
+	mutation := newTvMutation(c.config, OpUpdateOne, withTvID(id))
+	return &TvUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tv.
+func (c *TvClient) Delete() *TvDelete {
+	mutation := newTvMutation(c.config, OpDelete)
+	return &TvDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *TvClient) DeleteOne(t *Tv) *TvDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *TvClient) DeleteOneID(id int) *TvDeleteOne {
+	builder := c.Delete().Where(tv.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TvDeleteOne{builder}
+}
+
+// Query returns a query builder for Tv.
+func (c *TvClient) Query() *TvQuery {
+	return &TvQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Tv entity by its id.
+func (c *TvClient) Get(ctx context.Context, id int) (*Tv, error) {
+	return c.Query().Where(tv.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TvClient) GetX(ctx context.Context, id int) *Tv {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TvClient) Hooks() []Hook {
+	return c.hooks.Tv
 }

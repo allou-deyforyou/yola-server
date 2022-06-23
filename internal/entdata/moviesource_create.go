@@ -204,6 +204,20 @@ func (msc *MovieSourceCreate) SetFilmArticleSelector(sas *schema.MovieArticleSel
 	return msc
 }
 
+// SetLanguage sets the "language" field.
+func (msc *MovieSourceCreate) SetLanguage(s string) *MovieSourceCreate {
+	msc.mutation.SetLanguage(s)
+	return msc
+}
+
+// SetNillableLanguage sets the "language" field if the given value is not nil.
+func (msc *MovieSourceCreate) SetNillableLanguage(s *string) *MovieSourceCreate {
+	if s != nil {
+		msc.SetLanguage(*s)
+	}
+	return msc
+}
+
 // SetStatus sets the "status" field.
 func (msc *MovieSourceCreate) SetStatus(b bool) *MovieSourceCreate {
 	msc.mutation.SetStatus(b)
@@ -301,6 +315,10 @@ func (msc *MovieSourceCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (msc *MovieSourceCreate) defaults() {
+	if _, ok := msc.mutation.Language(); !ok {
+		v := moviesource.DefaultLanguage
+		msc.mutation.SetLanguage(v)
+	}
 	if _, ok := msc.mutation.Status(); !ok {
 		v := moviesource.DefaultStatus
 		msc.mutation.SetStatus(v)
@@ -309,6 +327,9 @@ func (msc *MovieSourceCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (msc *MovieSourceCreate) check() error {
+	if _, ok := msc.mutation.Language(); !ok {
+		return &ValidationError{Name: "language", err: errors.New(`entdata: missing required field "MovieSource.language"`)}
+	}
 	if _, ok := msc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`entdata: missing required field "MovieSource.status"`)}
 	}
@@ -504,6 +525,14 @@ func (msc *MovieSourceCreate) createSpec() (*MovieSource, *sqlgraph.CreateSpec) 
 			Column: moviesource.FieldFilmArticleSelector,
 		})
 		_node.FilmArticleSelector = value
+	}
+	if value, ok := msc.mutation.Language(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: moviesource.FieldLanguage,
+		})
+		_node.Language = value
 	}
 	if value, ok := msc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

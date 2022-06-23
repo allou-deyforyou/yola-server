@@ -31,6 +31,7 @@ var (
 		{Name: "manga_film_article_selector", Type: field.TypeJSON, Nullable: true},
 		{Name: "serie_article_selector", Type: field.TypeJSON, Nullable: true},
 		{Name: "film_article_selector", Type: field.TypeJSON, Nullable: true},
+		{Name: "language", Type: field.TypeString, Default: "fr"},
 		{Name: "status", Type: field.TypeBool, Default: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "url", Type: field.TypeString},
@@ -41,9 +42,27 @@ var (
 		Columns:    MovieSourcesColumns,
 		PrimaryKey: []*schema.Column{MovieSourcesColumns[0]},
 	}
+	// TvsColumns holds the columns for the "tvs" table.
+	TvsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "logo", Type: field.TypeString},
+		{Name: "video", Type: field.TypeString},
+		{Name: "title", Type: field.TypeString},
+		{Name: "status", Type: field.TypeBool, Default: true},
+		{Name: "country", Type: field.TypeString, Default: "ci"},
+		{Name: "description", Type: field.TypeString},
+		{Name: "language", Type: field.TypeString, Default: "fr"},
+	}
+	// TvsTable holds the schema information for the "tvs" table.
+	TvsTable = &schema.Table{
+		Name:       "tvs",
+		Columns:    TvsColumns,
+		PrimaryKey: []*schema.Column{TvsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		MovieSourcesTable,
+		TvsTable,
 	}
 )
 
